@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  pathsnap-api:
+    build: .
+    container_name: pathsnap-api-pt045
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped

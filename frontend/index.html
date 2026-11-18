@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PathSnap: Distributed Map-Matching Dashboard | Team PT-045</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Google Fonts & Leaflet CDN -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-branding">
+        <div class="logo-badge">PT-045</div>
+        <div>
+          <h1>PathSnap: Distributed Map-Matching & Route Reconstruction</h1>
+          <p class="subtitle">PES University | UE24CS352A: Machine Learning Hackathon</p>
+        </div>
+      </div>
+      <div class="api-config">
+        <span class="status-indicator online" id="statusDot"></span>
+        <label for="apiUrlInput">Laptop 1 API:</label>
+        <input type="text" id="apiUrlInput" value="http://localhost:8000" placeholder="http://<laptop-1-ip>:8000">
+        <button id="btnConnect" class="btn-sm">Connect</button>
+      </div>
+    </header>
+
+    <!-- Team Info Banner -->
+    <section class="team-banner">
+      <div class="team-title">Team Roster:</div>
+      <div class="team-members">
+        <div class="member-chip"><strong>Raghav Budur</strong> <span>PES1UG23AM225</span> (P1: Data & Spatial Index)</div>
+        <div class="member-chip"><strong>Pabbisetty Harshitha Sai</strong> <span>PES1UG24AM182</span> (P2: Features & 5 Models)</div>
+        <div class="member-chip"><strong>Palleneni Sloka</strong> <span>PES1UG24AM183</span> (P3: Bayes Opt & HMM Viterbi)</div>
+        <div class="member-chip"><strong>Parth Pandurang Kale</strong> <span>PES1UG24AM184</span> (P4: FastAPI & Dashboard)</div>
+      </div>
+    </section>
+
+    <!-- Main Grid -->
+    <main class="main-content">
+      <!-- Section 1: Trip Evaluation Selector & Live Runner -->
+      <section class="card evaluation-section">
+        <div class="card-header">
+          <h2>1. Evaluation Trip Selector (10 Reserved Trips)</h2>
+          <span class="badge">Laptop 2 Evaluator Interface</span>
+        </div>
+        <div class="card-body">
+          <p class="instruction">Select any of the 10 student/evaluator test trips to send inference request to Laptop 1 API:</p>
+          <div class="trip-grid" id="tripGrid">
+            <!-- Dynamic trip chips inserted here -->
+            <div class="loading-text">Loading reserved trips from API...</div>
+          </div>
+
+          <div class="run-control-bar">
+            <div class="selected-info" id="selectedTripLabel">Selected Trip: <strong>None</strong></div>
+            <button id="btnRunInference" class="btn-primary" disabled>
+              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              Run Pipeline & Evaluate
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 2: Real-time Evaluation Results -->
+      <section class="card results-section" id="resultsCard" style="display: none;">
+        <div class="card-header">
+          <h2>2. Evaluation Results for Trip <span id="resTripId"></span></h2>
+          <span class="badge badge-success">Server-Side Verified</span>
+        </div>
+        <div class="card-body">
+          <div class="metrics-row">
+            <div class="metric-card">
+              <div class="metric-title">Observation Top-1 Accuracy</div>
+              <div class="metric-val text-success" id="resAcc">--%</div>
+              <div class="metric-sub" id="resAccDiff">Classifier: --%</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-title">Route Continuity</div>
+              <div class="metric-val text-primary" id="resCont">--%</div>
+              <div class="metric-sub" id="resContDiff">Raw Classifier: --%</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-title">Observations Processed</div>
+              <div class="metric-val" id="resObs">--</div>
+              <div class="metric-sub" id="resArcs">-- predicted arcs</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-title">Inference Latency</div>
+              <div class="metric-val" id="resTime">-- ms</div>
+              <div class="metric-sub" id="resViterbiTime">Viterbi: -- ms</div>
+            </div>
+          </div>
+
+          <div class="map-container">
+            <div class="map-header-bar">
+              <div class="map-title">Interactive Geographical Visualisation (Folium / OpenStreetMap)</div>
+              <a id="btnOpenMapTab" href="#" target="_blank" class="btn-sm">Open Map in New Tab ↗</a>
+            </div>
+            <iframe id="mapFrame" src="about:blank" class="map-iframe"></iframe>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 3: Model Benchmark & Comparison Dashboard -->
+      <section class="card benchmark-section">
+        <div class="card-header">
+          <h2>3. Algorithm Comparison & Benchmarks (All 5 Models)</h2>
+          <span class="badge">Deliverables Section 3 & 4</span>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="benchmark-table">
+              <thead>
+                <tr>
+                  <th>Model</th>
+                  <th>Algorithm Family</th>
+                  <th>Key Configuration</th>
+                  <th>CV Macro F1</th>
+                  <th>Top-1 Accuracy</th>
+                  <th>Route Continuity</th>
+                  <th>Student-Test F1</th>
+                  <th>Log Loss</th>
+                  <th>Inference Time</th>
+                </tr>
+              </thead>
+              <tbody id="benchmarkTableBody">
+                <!-- Dynamically loaded -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Tuned vs Untuned & HMM summary -->
+          <div class="cards-duo">
+            <div class="sub-card">
+              <h3>Bayesian Hyperparameter Optimisation (Optuna TPE)</h3>
+              <p>Selected Model: <strong>Random Forest Classifier</strong> (Ensemble Family)</p>
+              <ul>
+                <li><strong>Search Space:</strong> <code>n_estimators</code> [60-160], <code>max_depth</code> [10-20], <code>min_samples_split</code> [4-16], <code>max_features</code> ['sqrt', 'log2', 0.6]</li>
+                <li><strong>Optimised Values:</strong> <code>n_estimators=120, max_depth=10, min_samples_split=11, min_samples_leaf=3, max_features=0.6</code></li>
+                <li><strong>Student-Test Top-1 Accuracy:</strong> 79.81% → <strong>79.90%</strong></li>
+                <li><strong>Log Loss:</strong> 0.1414 → <strong>0.1409</strong> (Lower is better)</li>
+              </ul>
+            </div>
+            <div class="sub-card highlight-card">
+              <h3>HMM + Viterbi Route Reconstruction Gains</h3>
+              <p>Decoupled Pointwise Classifier vs. Sequence-Level Trellis:</p>
+              <ul>
+                <li><strong>Route Continuity:</strong> 89.33% → <span class="highlight-stat">99.17% (+9.84%)</span></li>
+                <li><strong>Observation-Level Accuracy:</strong> 79.90% → <span class="highlight-stat">81.41% (+1.51%)</span></li>
+                <li><strong>Valid Topological Transitions:</strong> 17,107 → <strong>18,991 / 19,150</strong> (Eliminates teleportation)</li>
+                <li><strong>Viterbi Decoding Latency:</strong> <strong>&lt; 0.98s per trip</strong> (Ultra-fast DP)</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <p>PathSnap Distributed Map-Matching System | PES University RR Campus | Team PT-045</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
