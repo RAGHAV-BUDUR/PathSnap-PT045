@@ -1,0 +1,3 @@
+Pipeline Stage,Observation-Level Top-1 Accuracy,Route Continuity,Valid Topological Transitions
+Classifier-Only (Tuned RF),79.90%,89.33%,17107 / 19150
+Classifier + HMM Viterbi Decoding,81.41%,99.17%,18991 / 19150
