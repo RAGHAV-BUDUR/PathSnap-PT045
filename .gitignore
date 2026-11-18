@@ -1,0 +1,6 @@
+# Data directories
+train/
+student_test/
+*.pyc
+__pycache__/
+.ipynb_checkpoints/
