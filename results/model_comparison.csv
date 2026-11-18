@@ -1,0 +1,6 @@
+Model,Algorithm Family,Key Configuration,CV Macro F1-score,Top-1 Accuracy,Route continuity,Student-Test Macro F1-score,Log Loss,Inference Time
+Logistic Regression,Linear and probabilistic,"C=1.0, penalty=l2, max_iter=300, class_weight=balanced",0.8428,79.00%,87.89%,0.7675,0.2685,0.000 ms
+K-Nearest Neighbors,Instance-based,"n_neighbors=9, weights=distance, metric=euclidean",0.8595,76.78%,86.78%,0.8521,0.2693,0.074 ms
+Decision Tree,Tree-based,"max_depth=12, min_samples_split=20, criterion=gini",0.8742,79.08%,87.83%,0.8679,0.1734,0.000 ms
+Random Forest,Ensemble,"n_estimators=100, max_depth=14, min_samples_split=10, max_features=sqrt",0.8806,79.81%,89.11%,0.8746,0.1414,0.001 ms
+HistGradientBoosting,Boosting,"learning_rate=0.08, max_iter=120, max_depth=8, l2_regularization=1.0",0.8814,79.68%,88.97%,0.8729,0.1409,0.002 ms
