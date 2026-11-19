@@ -6,7 +6,7 @@
 # ==============================================================================
 
 MEMBER_NAME="Parth Pandurang Kale"
-MEMBER_EMAIL="pes1ug24am184@pes.edu"
+MEMBER_EMAIL="parthkale64@gmail.com"
 
 P4_FILES=(
     "src/map_viz.py"
